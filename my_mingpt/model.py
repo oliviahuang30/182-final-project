@@ -46,25 +46,25 @@ class MySelfAttention(nn.Module):
         ############################################################################
         # raise NotImplementedError()
         super().__init__()
-        assert n_embd %n_head == 0
-        self.w1 = nn.Linear(n_embd, n_embd)
-        self.w2 = nn.Parameter(torch.zeros( n_embd //  n_head,
+        assert config.n_embd % config.n_head == 0
+        self.w1 = nn.Linear(config.n_embd, config.n_embd)
+        self.w2 = nn.Parameter(torch.zeros( config.n_embd //  config.n_head,
              block_size-1)) #d_k,T
-        self.b2 = nn.Parameter(torch.zeros(block_size-1)) #T
+        self.b2 = nn.Parameter(torch.zeros(config.block_size-1)) #T
         # value projection
-        self.value = nn.Linear( n_embd,  n_embd) #dmodel,dmodel
+        self.value = nn.Linear( config.n_embd,  config.n_embd) #dmodel,dmodel
         # regularization
-        self.attn_drop = nn.Dropout( attn_pdrop)
-        self.resid_drop = nn.Dropout( resid_pdrop)
+        self.attn_drop = nn.Dropout( config.attn_pdrop)
+        self.resid_drop = nn.Dropout( config.resid_pdrop)
         # output projection
-        self.proj = nn.Linear( n_embd,  n_embd) #dmodel,dmodel
+        self.proj = nn.Linear( config.n_embd,  config.n_embd) #dmodel,dmodel
         # causal mask to ensure that attention is only applied to the left in
         #     the input sequence
         self.register_buffer("mask", torch.tril(
-            torch.ones( block_size,  block_size)).view(
-                1, 1,  block_size,  block_size)) #mask
-        self.n_head =  n_head
-        self.block_size =  block_size
+            torch.ones( config.block_size,  config.block_size)).view(
+                1, 1,  config.block_size,  config.block_size)) #mask
+        self.n_head =  config.n_head
+        self.block_size =  config.block_size
 
         nn.init.uniform_(self.w2,-0.001,0.001)
         ############################################################################
