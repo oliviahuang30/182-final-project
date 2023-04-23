@@ -49,8 +49,8 @@ class MySelfAttention(nn.Module):
         assert config.n_embd % config.n_head == 0
         self.w1 = nn.Linear(config.n_embd, config.n_embd)
         self.w2 = nn.Parameter(torch.zeros( config.n_embd //  config.n_head,
-             config.block_size-1)) #d_k,T
-        self.b2 = nn.Parameter(torch.zeros(config.block_size-1)) #T
+             config.block_size)) #d_k,T
+        self.b2 = nn.Parameter(torch.zeros(config.block_size)) #T
         # value projection
         self.value = nn.Linear( config.n_embd,  config.n_embd) #dmodel,dmodel
         # regularization
