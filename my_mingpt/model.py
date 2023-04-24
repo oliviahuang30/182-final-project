@@ -27,8 +27,7 @@ class NewGELU(nn.Module):
         ############################################################################
         # TODO: implement this function
         ############################################################################
-        # raise NotImplementedError()
-        output = 0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0))))
+        raise NotImplementedError()
         ############################################################################
         return output
 
@@ -44,52 +43,14 @@ class MySelfAttention(nn.Module):
         ############################################################################
         # TODO: implement this function
         ############################################################################
-        # raise NotImplementedError()
-        super().__init__()
-        assert config.n_embd % config.n_head == 0
-        self.w1 = nn.Linear(config.n_embd, config.n_embd)
-        self.w2 = nn.Parameter(torch.zeros( config.n_embd //  config.n_head,
-             config.block_size)) #d_k,T
-        self.b2 = nn.Parameter(torch.zeros(config.block_size)) #T
-        # value projection
-        self.value = nn.Linear( config.n_embd,  config.n_embd) #dmodel,dmodel
-        # regularization
-        self.attn_drop = nn.Dropout( config.attn_pdrop)
-        self.resid_drop = nn.Dropout( config.resid_pdrop)
-        # output projection
-        self.proj = nn.Linear( config.n_embd,  config.n_embd) #dmodel,dmodel
-        # causal mask to ensure that attention is only applied to the left in
-        #     the input sequence
-        self.register_buffer("mask", torch.tril(
-            torch.ones( config.block_size,  config.block_size)).view(
-                1, 1,  config.block_size,  config.block_size)) #mask
-        self.n_head =  config.n_head
-        self.block_size =  config.block_size
-
-        nn.init.uniform_(self.w2,-0.001,0.001)
+        raise NotImplementedError()
         ############################################################################
 
     def forward(self, x):
         ############################################################################
         # TODO: implement this function
         ############################################################################
-        # raise NotImplementedError()
-        B, T, C = x.size()
-        # @ : The matrix multiplication(s) are done between the last two dimensions
-        d_k = C//self.n_head
-        relu_out = F.relu(self.w1(x)).\
-            view(B,T,self.n_head,d_k).transpose(1,2)
-
-        v = self.value(x).view(B,T,self.n_head,d_k).transpose(1,2)
-        scores = (relu_out@self.w2)  + self.b2
-
-        scores = scores[:,:,:T,:T] # to ensure it runs for T<block_size
-        scores = scores.masked_fill(self.mask[:,:,:T,:T]==0,-1e10)
-        prob_attn = F.softmax(scores,dim=-1)
-        y = prob_attn@v
-
-        y = y.transpose(1, 2).contiguous().view(B, T, C)
-        y = self.resid_drop(self.proj(y))
+        raise NotImplementedError()
         ############################################################################
         return y
 
@@ -285,25 +246,7 @@ class GPT(nn.Module):
         ############################################################################
         # TODO: implement this function
         ############################################################################
-        # raise NotImplementedError()
-        device = idx.device
-        b, t = idx.size()
-        assert t <= self.block_size, f"Cannot forward sequence of length {t}, block size is only {self.block_size}"
-        pos = torch.arange(0, t, dtype=torch.long, device=device).unsqueeze(0) # shape (1, t)
-
-        # forward the GPT model itself
-        tok_emb = self.transformer.wte(idx) # token embeddings of shape (b, t, n_embd)
-        pos_emb = self.transformer.wpe(pos) # position embeddings of shape (1, t, n_embd)
-        x = self.transformer.drop(tok_emb + pos_emb)
-        for block in self.transformer.h:
-            x = block(x)
-        x = self.transformer.ln_f(x)
-        logits = self.lm_head(x)
-
-        # if we are given some desired targets also calculate the loss
-        loss = None
-        if targets is not None:
-            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1)
+        raise NotImplementedError()
         ############################################################################
         return logits, loss
 
@@ -317,27 +260,7 @@ class GPT(nn.Module):
         ############################################################################
         # TODO: implement this function
         ############################################################################
-        # raise NotImplementedError()
-        for _ in range(max_new_tokens):
-            # if the sequence context is growing too long we must crop it at block_size
-            idx_cond = idx if idx.size(1) <= self.block_size else idx[:, -self.block_size:]
-            # forward the model to get the logits for the index in the sequence
-            logits, _ = self(idx_cond)
-            # pluck the logits at the final step and scale by desired temperature
-            logits = logits[:, -1, :] / temperature
-            # optionally crop the logits to only the top k options
-            if top_k is not None:
-                v, _ = torch.topk(logits, top_k)
-                logits[logits < v[:, [-1]]] = -float('Inf')
-            # apply softmax to convert logits to (normalized) probabilities
-            probs = F.softmax(logits, dim=-1)
-            # either sample from the distribution or take the most likely element
-            if do_sample:
-                idx_next = torch.multinomial(probs, num_samples=1)
-            else:
-                _, idx_next = torch.topk(probs, k=1, dim=-1)
-            # append sampled index to the running sequence and continue
-            idx = torch.cat((idx, idx_next), dim=1)
+        raise NotImplementedError()
         ############################################################################
 
         return idx
