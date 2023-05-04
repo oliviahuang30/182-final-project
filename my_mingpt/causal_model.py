@@ -254,6 +254,25 @@ class GPT(nn.Module):
         ############################################################################
         # TODO: implement this function
         ############################################################################
+        device = idx.device
+        b, t = idx.size()
+        assert t <= self.block_size, f"Cannot forward sequence of length {t}, block size is only {self.block_size}"
+        pos = torch.arange(0, t, dtype=torch.long, device=device).unsqueeze(0) # shape (1, t)
+
+        # forward the GPT model itself
+        tok_emb = None # token embeddings of shape (b, t, n_embd)
+        pos_emb = None # position embeddings of shape (1, t, n_embd)
+        x = None #dropout
+        for block in self.transformer.h:
+            x = None #apply each block to x
+        x = None #layer norm
+        logits = None
+
+        # if we are given some desired targets also calculate the loss
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-1)
+            
         raise NotImplementedError()
         ############################################################################
         return logits, loss
